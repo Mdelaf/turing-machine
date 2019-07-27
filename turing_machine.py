@@ -58,10 +58,16 @@ class TuringMachine:
             attributes = parser.parse()
         return TuringMachine(*attributes)
 
-    def print_current_configuration(self, tapes):
-        print(self.current_state)
-        for tape, pos in zip(tapes.words, tapes.current_positions):
-            print(pos, ":", tape)
+    def print_current_configuration(self):
+        print(f"State: {self.current_state}")
+        max_position = max(self.tapes.current_positions)
+        copied_tapes = []
+        for tape, pos in zip(self.tapes.words, self.tapes.current_positions):
+            copied_tapes.append(["_"] * (max_position - pos) + list(tape))
+        max_length = max(len(tape) for tape in copied_tapes)
+        print(" " * max_position * 2 + "V")
+        for tape in copied_tapes:
+            print(" ".join(tape) + " _" * (max_length - len(tape)))
 
     def current_machine_configuration(self):
         return hash(str(self.tapes.current_positions) + str(self.tapes.words) + self.current_state)
