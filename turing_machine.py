@@ -48,6 +48,7 @@ class TuringMachine:
         self.transitions = transitions
         state, symbols = next(iter(transitions.keys()))
         self.number_of_tapes = len(symbols)
+        self.tapes = None
         self.current_state = None
 
     @classmethod
@@ -62,27 +63,27 @@ class TuringMachine:
         for tape, pos in zip(tapes.words, tapes.current_positions):
             print(pos, ":", tape)
 
-    def current_machine_configuration(self, tapes):
-        return hash(str(tapes.current_positions) + str(tapes.words) + self.current_state)
+    def current_machine_configuration(self):
+        return hash(str(self.tapes.current_positions) + str(self.tapes.words) + self.current_state)
 
-    def next_step(self, tapes):
-        return self.transitions.get((self.current_state, tapes.current_symbols), [None, None, None])
+    def next_step(self):
+        return self.transitions.get((self.current_state, self.tapes.current_symbols), [None, None, None])
 
     def run(self, word, timeout=None):
         self.current_state = self.initial_state
-        tapes = Tapes(word, self.number_of_tapes)
-        configurations = {self.current_machine_configuration(tapes)}
-        to_state, to_symbols, movements = self.next_step(tapes)
+        self.tapes = Tapes(word, self.number_of_tapes)
+        configurations = {self.current_machine_configuration()}
+        to_state, to_symbols, movements = self.next_step()
         start_time = datetime.now()
         while to_state:
             self.current_state = to_state
-            tapes.write_symbols(to_symbols)
-            tapes.move_positions(movements)
-            new_configuration = self.current_machine_configuration(tapes)
+            self.tapes.write_symbols(to_symbols)
+            self.tapes.move_positions(movements)
+            new_configuration = self.current_machine_configuration()
             if new_configuration in configurations:
                 return None
             configurations.add(new_configuration)
-            to_state, to_symbols, movements = self.next_step(tapes)
+            to_state, to_symbols, movements = self.next_step()
             if timeout and (datetime.now() - start_time).total_seconds() >= timeout:
                 return None
         return self.current_state in self.final_states
