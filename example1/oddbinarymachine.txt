@@ -1,0 +1,15 @@
+name: isOdd
+init: q0
+accept: qf
+
+q0,0
+q0,0,>
+
+q0,1
+q0,1,>
+
+q0,_
+q1,_,<
+
+q1,1
+qf,1,>
